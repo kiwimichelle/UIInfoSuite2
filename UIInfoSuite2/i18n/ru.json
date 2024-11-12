@@ -1,18 +1,60 @@
-{
+﻿{
   // GUI - Game Menu
   // "OptionsTabTooltip": "UI Info Suite 2 Options", // TODO
+  // some config options
+  "Bool.ShowOptionsTabInMenu.DisplayedName": "Показывать кнопку настроек во внутриигровом меню",
+  "Bool.ShowOptionsTabInMenu.Tooltip": "Включает во внутриигровое меню дополнительную вкладку, где вы можете настроить все параметры мода.",
+  "Text.ApplyDefaultSettingsFromThisSave.DisplayedName": "Применить стандартные настройки из этого сохранения",
+  "Text.ApplyDefaultSettingsFromThisSave.Tooltip": "К новым персонажам будут применяться настройки из этого файла сохранения.",
+  "Keybinds.OpenCalendarKeybind.DisplayedName": "Кнопка открытия календаря",
+  "Keybinds.OpenCalendarKeybind.Tooltip": "Открывает календарь.",
+  "Keybinds.OpenQuestBoardKeybind.DisplayedName": "Кнопка открытия доски объявлений",
+  "Keybinds.OpenQuestBoardKeybind.Tooltip": "Открывает доску объявлений.",
+  "Keybinds.Subtitle.ShowRange.displayedName": "Показывать радиус работы объектов",
+  "Keybinds.Subtitle.ShowRange.Tooltip": "Таких как: пугало, спринклер, домик Джунимо, улей, грибной пень и мшистое семечко.",
+  "Keybinds.ShowOneRange.DisplayedName": "Показывать радиус работы используемого объекта",
+  "Keybinds.ShowOneRange.Tooltip": "Когда мышка указывает на объект, показывать радиус этого объекта.",
+  "Keybinds.ShowAllRange.DisplayedName": "Показывать радиус всех объектов",
+  "Keybinds.ShowAllRange.Tooltip": "Когда мышка указывает на объект, показывать радиус всех объектов.",
   //GUI - Billboard
   "Billboard": "Объявления",
   "Calendar": "Календарь",
+  "SlayerGoals": "План по истреблению",
   //GUI - Seed shop
   "HarvestPrice": "Цена урожая",
   //Production
   "Days": "дней",
   "Hours": "часов",
   "Minutes": "минут",
+  "MachineProcessing": "Обработка",
+  "MachineDone": "Готово",
   //Harvest
   "DaysToMature": "дней до созревания",
   "ReadyToHarvest": "Готово к сбору урожая!",
+  "With": "Содержит",
+  "Fertilized": "Удобрено",
+  "Watered": "Полито",
+  "NotWatered": "Не полито",
+  "DoesNotProduceThisSeason": "В этот сезон не плодоносит",
+  //Tree
+  "Stump": "Пень",
+  // This space is required for languages that use a space between words, delete otherwise (e.g. Korean)
+  "Tree": " ", //Most of the basic trees do not use the *thing*-tree word construction. If i knew how to delete it completely instead of using blank space, i would.
+  "stage": "Рост",
+  "Oak": "Дуб",
+  "Maple": "Клён",
+  "Pine": "Сосна",
+  "Palm": "Пальма",
+  "Mushroom": "Грибное дерево",
+  "Mahogany": "Красное дерево",
+  "PalmJungle": "Пальма (Джунгли)",
+  "GreenRainType1": "Мшистое дерево",
+  "GreenRainType2": "Густое мшистое дерево",
+  "GreenRainType3": "Папоротниковое дерево",
+  "Mystic": "Таинственое дерево",
+  "VmvBirch": "(VMV) Берёза",
+  "SVEBirch": "(SVE) Берёза",
+  "SVEFir": "(SVE) Ель",
   //Display icons - General
   "TodaysRecipe": "Сегодняшний рецепт: ",
   "TravelingMerchantIsInTown": "Странствующий Торговец в городе!",
@@ -52,6 +94,8 @@
   "HideAnimalPetOnMaxFriendship": "Скрывать при максимальной дружбе",
   "ShowCropAndBarrelTooltip": "Показывать время у урожая и бочек",
   "ShowItemEffectRanges": "Показывать радиус пугал и спринклеров",
+  "ButtonControlShow": "Показывать радиус объекта нажатием leftctrl, показывать радиус всех объектов нажатием leftalt",
+  "ShowBombRange": "Показывать радиус подрыва бомбы",
   "ShowExtraItemInformation": "Показывать дополнительную информацию по предметам",
   "ShowHarvestPricesInShop": "Показывать цену урожая в магазине",
   //Settings - Tabs info
@@ -72,5 +116,6 @@
   "ShowSeasonalBerry": "Показывать сезонные растения",
   "ShowSeasonalBerryHazelnut": "Показывать фундук на деревьях",
   //Others
-  "LevelUp": "Уровень повышен"
+  "LevelUp": "Уровень повышен",
+  "TrackOnMap": "Отслеживать на карте"
 }
