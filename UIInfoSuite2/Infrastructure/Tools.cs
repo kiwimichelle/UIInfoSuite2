@@ -9,6 +9,7 @@ using StardewValley.GameData.Crops;
 using StardewValley.GameData.FruitTrees;
 using StardewValley.Menus;
 using StardewValley.TerrainFeatures;
+using StardewValley.WorldMaps;
 using SObject = StardewValley.Object;
 
 namespace UIInfoSuite2.Infrastructure;
@@ -302,5 +303,12 @@ public static class Tools
     }
 
     return days.Count == 0 ? null : days.Max();
+  }
+
+  public static MapAreaPosition? GetMapPositionDataSafe(GameLocation location, Point position)
+  {
+    MapAreaPosition? mapAreaPosition = WorldMapManager.GetPositionData(location, position)?.Data;
+
+    return mapAreaPosition ?? WorldMapManager.GetPositionData(Game1.getFarm(), Point.Zero)?.Data;
   }
 }
