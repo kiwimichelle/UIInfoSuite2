@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using StardewValley;
 using StardewValley.TerrainFeatures;
 
@@ -13,12 +12,6 @@ public interface ICustomBushApi
   /// <param name="customBush">The resulting custom bush, if applicable.</param>
   /// <returns>Returns whether a custom bush was found.</returns>
   public bool TryGetBush(Bush bush, [NotNullWhen(true)] out ICustomBush? customBush);
-
-  /// <summary>Try to get the custom bush drop associated with the given bush id.</summary>
-  /// <param name="bush">The bush to check.</param>
-  /// <param name="drops">The items produced by the custom bush, if applicable.</param>
-  /// <returns>Returns whether custom bush drops were found.</returns>
-  public bool TryGetDrops(Bush bush, [NotNullWhen(true)] out List<ICustomBushDrop>? drops);
 
   /// <summary>Try to get the shake off item.</summary>
   /// <param name="bush">The bush.</param>

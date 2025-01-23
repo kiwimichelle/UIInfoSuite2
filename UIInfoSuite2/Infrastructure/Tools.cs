@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Extensions;
 using StardewValley.GameData.Crops;
 using StardewValley.GameData.FruitTrees;
 using StardewValley.Menus;
 using StardewValley.TerrainFeatures;
-using UIInfoSuite2.Compatibility;
+using StardewValley.WorldMaps;
 using SObject = StardewValley.Object;
 
 namespace UIInfoSuite2.Infrastructure;
@@ -43,45 +42,20 @@ public static class Tools
 
   public static SObject? GetHarvest(Item item)
   {
-    if (item is SObject { Category: SObject.SeedsCategory } seedsObject && seedsObject.ItemId != Crop.mixedSeedsId)
+    if (item is not SObject { Category: SObject.SeedsCategory } seedsObject || seedsObject.ItemId == Crop.mixedSeedsId)
     {
-      if (seedsObject.IsFruitTreeSapling() && FruitTree.TryGetData(item.ItemId, out FruitTreeData? fruitTreeData))
-      {
-        // TODO support multiple items returned
-        return ItemRegistry.Create<SObject>(fruitTreeData.Fruit[0].ItemId);
-      }
+      return null;
+    }
 
-      if (ModEntry.DGA.IsCustomObject(item, out DynamicGameAssetsHelper? dgaHelper))
-      {
-        try
-        {
-          return dgaHelper.GetSeedsHarvest(item);
-        }
-        catch (Exception e)
-        {
-          string? itemId = null;
-          try
-          {
-            itemId = dgaHelper.GetFullId(item);
-          }
-          catch (Exception catchException)
-          {
-            ModEntry.MonitorObject.Log(catchException.ToString());
-          }
+    if (seedsObject.IsFruitTreeSapling() && FruitTree.TryGetData(item.ItemId, out FruitTreeData? fruitTreeData))
+    {
+      // TODO support multiple items returned
+      return ItemRegistry.Create<SObject>(fruitTreeData.Fruit[0].ItemId);
+    }
 
-          ModEntry.MonitorObject.LogOnce(
-            $"An error occured while fetching the harvest for {itemId ?? "unknownItem"}",
-            LogLevel.Error
-          );
-          ModEntry.MonitorObject.Log(e.ToString(), LogLevel.Debug);
-          return null;
-        }
-      }
-
-      if (Crop.TryGetData(item.ItemId, out CropData cropData) && cropData.HarvestItemId is not null)
-      {
-        return ItemRegistry.Create<SObject>(cropData.HarvestItemId);
-      }
+    if (Crop.TryGetData(item.ItemId, out CropData cropData) && cropData.HarvestItemId is not null)
+    {
+      return ItemRegistry.Create<SObject>(cropData.HarvestItemId);
     }
 
     return null;
@@ -186,6 +160,70 @@ public static class Tools
     }
   }
 
+  public static void CopySection(
+    Texture2D sourceTexture,
+    Texture2D destinationTexture,
+    Rectangle sourceRectangle,
+    Point destinationPosition,
+    bool overlayTransparent = false
+  )
+  {
+    // Ensure the source rectangle is within the bounds of the source texture
+    if (sourceRectangle.X < 0 ||
+        sourceRectangle.Y < 0 ||
+        sourceRectangle.X + sourceRectangle.Width > sourceTexture.Width ||
+        sourceRectangle.Y + sourceRectangle.Height > sourceTexture.Height)
+    {
+      throw new ArgumentOutOfRangeException(
+        nameof(sourceRectangle),
+        "Source rectangle is out of bounds of the source texture."
+      );
+    }
+
+    // Ensure the destination rectangle is within the bounds of the destination texture
+    if (destinationPosition.X < 0 ||
+        destinationPosition.Y < 0 ||
+        destinationPosition.X + sourceRectangle.Width > destinationTexture.Width ||
+        destinationPosition.Y + sourceRectangle.Height > destinationTexture.Height)
+    {
+      throw new ArgumentOutOfRangeException(
+        nameof(destinationPosition),
+        "Destination position is out of bounds of the destination texture."
+      );
+    }
+
+    var emptyColor = new Color(0, 0, 0, 0);
+    var sourceData = new Color[sourceRectangle.Width * sourceRectangle.Height];
+    sourceTexture.GetData(0, sourceRectangle, sourceData, 0, sourceData.Length);
+
+    // Extract the color data from the destination texture
+    var destinationData = new Color[destinationTexture.Width * destinationTexture.Height];
+    destinationTexture.GetData(destinationData);
+
+    // Copy the source data into the destination data at the specified position
+    for (var y = 0; y < sourceRectangle.Height; y++)
+    {
+      for (var x = 0; x < sourceRectangle.Width; x++)
+      {
+        int destIndex = (destinationPosition.Y + y) * destinationTexture.Width + destinationPosition.X + x;
+        int sourceIndex = y * sourceRectangle.Width + x;
+
+        Color sourcePixel = sourceData[sourceIndex];
+
+        // If using overlay mode, don't copy transparent pixels
+        if (overlayTransparent && emptyColor.Equals(sourcePixel))
+        {
+          continue;
+        }
+
+        destinationData[destIndex] = sourcePixel;
+      }
+    }
+
+    // Set the modified color data back to the destination texture
+    destinationTexture.SetData(destinationData);
+  }
+
   public static IEnumerable<int> GetDaysFromCondition(GameStateQuery.ParsedGameStateQuery parsedGameStateQuery)
   {
     HashSet<int> days = new();
@@ -265,5 +303,12 @@ public static class Tools
     }
 
     return days.Count == 0 ? null : days.Max();
+  }
+
+  public static MapAreaPosition? GetMapPositionDataSafe(GameLocation location, Point position)
+  {
+    MapAreaPosition? mapAreaPosition = WorldMapManager.GetPositionData(location, position)?.Data;
+
+    return mapAreaPosition ?? WorldMapManager.GetPositionData(Game1.getFarm(), Point.Zero)?.Data;
   }
 }

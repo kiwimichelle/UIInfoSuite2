@@ -13,12 +13,24 @@ namespace UIInfoSuite2;
 
 public class ModEntry : Mod
 {
+  private static SkipIntro _skipIntro; // Needed so GC won't throw away object with subscriptions
+  public static ModConfig _modConfig;
+
+  private static EventHandler<ButtonsChangedEventArgs> _calendarAndQuestKeyBindingsHandler;
+
+  private ModOptions _modOptions;
+  private ModOptionsPageHandler _modOptionsPageHandler;
+
+  public static IReflectionHelper Reflection { get; private set; } = null!;
+
+  public static IMonitor MonitorObject { get; private set; } = null!;
+
 #region Entry
   public override void Entry(IModHelper helper)
   {
-    MonitorObject = Monitor;
-    DGA = new DynamicGameAssetsEntry(Helper, Monitor);
     I18n.Init(helper.Translation);
+    Reflection = helper.Reflection;
+    MonitorObject = Monitor;
 
     _skipIntro = new SkipIntro(helper.Events);
     _modConfig = Helper.ReadConfig<ModConfig>();
@@ -53,48 +65,54 @@ public class ModEntry : Mod
     // add some config options
     configMenu.AddBoolOption(
       ModManifest,
-      name: () => "Show options in in-game menu",
-      tooltip: () => "Enables an extra tab in the in-game menu where you can configure every options for this mod.",
+      name: () => I18n.Bool_ShowOptionsTabInMenu_DisplayedName(),
+      tooltip: () => I18n.Bool_ShowOptionsTabInMenu_Tooltip(),
       getValue: () => _modConfig.ShowOptionsTabInMenu,
       setValue: value => _modConfig.ShowOptionsTabInMenu = value
     );
     configMenu.AddTextOption(
       ModManifest,
-      name: () => "Apply default settings from this save",
-      tooltip: () => "New characters will inherit the settings for the mod from this save file.",
+      name: () => I18n.Text_ApplyDefaultSettingsFromThisSave_DisplayedName(),
+      tooltip: () => I18n.Text_ApplyDefaultSettingsFromThisSave_Tooltip(),
       getValue: () => _modConfig.ApplyDefaultSettingsFromThisSave,
       setValue: value => _modConfig.ApplyDefaultSettingsFromThisSave = value
     );
     configMenu.AddKeybindList(
       ModManifest,
-      name: () => "Open calendar keybind",
-      tooltip: () => "Opens the calendar tab.",
+      name: () => I18n.Keybinds_OpenCalendarKeybind_DisplayedName(),
+      tooltip: () => I18n.Keybinds_OpenCalendarKeybind_Tooltip(),
       getValue: () => _modConfig.OpenCalendarKeybind,
       setValue: value => _modConfig.OpenCalendarKeybind = value
     );
     configMenu.AddKeybindList(
       ModManifest,
-      name: () => "Open quest board keybind",
-      tooltip: () => "Opens the quest board.",
+      name: () => I18n.Keybinds_OpenQuestBoardKeybind_DisplayedName(),
+      tooltip: () => I18n.Keybinds_OpenQuestBoardKeybind_Tooltip(),
       getValue: () => _modConfig.OpenQuestBoardKeybind,
       setValue: value => _modConfig.OpenQuestBoardKeybind = value
     );
+    // Show item effect ranges
+    configMenu.AddSectionTitle(
+      ModManifest,
+      text: () => I18n.Keybinds_Subtitle_ShowRange_DisplayedName(),
+      tooltip: () => I18n.Keybinds_Subtitle_ShowRange_Tooltip()
+      );
+    configMenu.AddKeybindList(
+      ModManifest,
+      name: () => I18n.Keybinds_ShowOneRange_DisplayedName(),
+      tooltip: () => I18n.Keybinds_ShowOneRange_Tooltip(),
+      getValue: () => _modConfig.ShowOneRange,
+      setValue: value => _modConfig.ShowOneRange = value
+    );
+    configMenu.AddKeybindList(
+      ModManifest,
+      name: () => I18n.Keybinds_ShowAllRange_DisplayedName(),
+      tooltip: () => I18n.Keybinds_ShowAllRange_Tooltip(),
+      getValue: () => _modConfig.ShowAllRange,
+      setValue: value => _modConfig.ShowAllRange = value
+      );
   }
 #endregion
-
-#region Properties
-  public static IMonitor MonitorObject { get; private set; }
-  public static DynamicGameAssetsEntry DGA { get; private set; }
-
-  private static SkipIntro _skipIntro; // Needed so GC won't throw away object with subscriptions
-  private static ModConfig _modConfig;
-
-  private ModOptions _modOptions;
-  private ModOptionsPageHandler _modOptionsPageHandler;
-
-  private static EventHandler<ButtonsChangedEventArgs> _calendarAndQuestKeyBindingsHandler;
-#endregion
-
 
 #region Event subscriptions
   private void OnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
@@ -121,6 +139,7 @@ public class ModEntry : Mod
                   Helper.Data.ReadJsonFile<ModOptions>($"data/{_modConfig.ApplyDefaultSettingsFromThisSave}.json") ??
                   new ModOptions();
 
+    _modOptionsPageHandler?.Dispose();
     _modOptionsPageHandler = new ModOptionsPageHandler(Helper, _modOptions, _modConfig.ShowOptionsTabInMenu);
   }
 

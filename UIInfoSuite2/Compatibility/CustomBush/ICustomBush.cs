@@ -31,6 +31,9 @@ public interface ICustomBush
   /// <summary>Gets the default texture used when planted indoors.</summary>
   public string IndoorTexture { get; }
 
+  /// <summary>Gets or sets the items produced by this custom bush.</summary>
+  public ICustomBushDrops ItemsProduced { get; }
+
   /// <summary>Gets the rules which override the locations that custom bushes can be planted in.</summary>
   public List<PlantableRule> PlantableLocationRules { get; }
 
