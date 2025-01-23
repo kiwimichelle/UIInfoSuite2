@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -610,7 +610,7 @@ internal class ShowCropAndBarrelTime : IDisposable
 
       if (ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi))
       {
-        if (customBushApi.TryGetCustomBush(bush, out ICustomBush? customBushData, out string? id))
+        if (customBushApi.TryGetBush(bush, out ICustomBush? customBushData))
         {
           droppedItems.Clear();
           willProduceThisSeason = customBushData.Seasons.Contains(Game1.season);
@@ -619,13 +619,13 @@ internal class ShowCropAndBarrelTime : IDisposable
           inProductionPeriod = Game1.dayOfMonth >= customBushData.DayToBeginProducing;
           daysUntilProductionPeriod = inProductionPeriod ? 0 : 22 - Game1.dayOfMonth;
 
-          if (customBushData.GetShakeOffItemIfReady(bush, out ParsedItemData? shakeOffItemData))
+          if (customBushApi.TryGetShakeOffItem(bush, out Item? item))
           {
-            droppedItems.Add(new CustomBushDroppedItem(id, Game1.dayOfMonth, shakeOffItemData, 1.0f));
+            droppedItems.Add(new CustomBushDroppedItem(customBushData.Id, Game1.dayOfMonth, ItemRegistry.GetData(item.ItemId), 1.0f));
           }
           else
           {
-            droppedItems = customBushApi.GetCustomBushDropItems(customBushData, id, false);
+            droppedItems = customBushApi.GetCustomBushDropItems(bush, customBushData, false);
           }
         }
       }

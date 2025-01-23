@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
@@ -15,45 +14,16 @@ public record CustomBushDroppedItem(string BushId, int NextDayToProduce, ParsedI
 
 internal static class CustomBushExtensions
 {
-  private const string ShakeOffItem = $"{ModCompat.CustomBush}/ShakeOff";
-
-  public static bool GetShakeOffItemIfReady(
-    this ICustomBush customBush,
-    Bush bush,
-    [NotNullWhen(true)] out ParsedItemData? item
-  )
-  {
-    item = null;
-    if (bush.size.Value != Bush.greenTeaBush)
-    {
-      return false;
-    }
-
-    if (!bush.modData.TryGetValue(ShakeOffItem, out string itemId))
-    {
-      return false;
-    }
-
-    item = ItemRegistry.GetData(itemId);
-    return true;
-  }
-
   public static List<CustomBushDroppedItem> GetCustomBushDropItems(
     this ICustomBushApi api,
-    ICustomBush bush,
-    string? id,
+    Bush bush,
+    ICustomBush customBush,
     bool includeToday = true
   )
   {
     List<CustomBushDroppedItem> items = new();
 
-    if (id == null || string.IsNullOrEmpty(id))
-    {
-      return items;
-    }
-
-    api.TryGetDrops(id, out IList<ICustomBushDrop>? drops);
-    if (drops == null)
+    if (!api.TryGetDrops(bush, out List<ICustomBushDrop>? drops))
     {
       return items;
     }
@@ -71,7 +41,7 @@ internal static class CustomBushExtensions
         if (!lastDay.HasValue)
         {
           ModEntry.MonitorObject.Log(
-            $"Couldn't parse the next day the bush {bush.DisplayName} will drop {drop.ItemId}. Condition: {drop.Condition}. Please report this error.",
+            $"Couldn't parse the next day the bush {customBush.DisplayName} will drop {drop.ItemId}. Condition: {drop.Condition}. Please report this error.",
             LogLevel.Error
           );
         }
@@ -82,7 +52,7 @@ internal static class CustomBushExtensions
       if (itemData == null)
       {
         ModEntry.MonitorObject.Log(
-          $"Couldn't parse the correct item {bush.DisplayName} will drop. ItemId: {drop.ItemId}. Please report this error.",
+          $"Couldn't parse the correct item {customBush.DisplayName} will drop. ItemId: {drop.ItemId}. Please report this error.",
           LogLevel.Error
         );
         continue;
@@ -93,7 +63,7 @@ internal static class CustomBushExtensions
         continue;
       }
 
-      items.Add(new CustomBushDroppedItem(id, nextDay.Value, itemData, drop.Chance));
+      items.Add(new CustomBushDroppedItem(customBush.Id, nextDay.Value, itemData, drop.Chance));
     }
 
     return items;

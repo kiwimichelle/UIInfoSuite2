@@ -10,6 +10,12 @@ public interface ICustomBush
   /// <summary>Gets the age needed to produce.</summary>
   public int AgeToProduce { get; }
 
+  /// <summary>Gets the busy type.</summary>
+  public BushType BushType { get; }
+
+  /// <summary>Gets a list of conditions where any have to match for the bush to produce items.</summary>
+  public List<string> ConditionsToProduce { get; }
+
   /// <summary>Gets the day of month to begin producing.</summary>
   public int DayToBeginProducing { get; }
 
@@ -19,14 +25,17 @@ public interface ICustomBush
   /// <summary>Gets the display name of the bush.</summary>
   public string DisplayName { get; }
 
+  /// <summary>Gets a unique identifier for the custom bush.</summary>
+  public string Id { get; }
+
   /// <summary>Gets the default texture used when planted indoors.</summary>
   public string IndoorTexture { get; }
 
-  /// <summary>Gets the season in which this bush will produce its drops.</summary>
-  public List<Season> Seasons { get; }
-
   /// <summary>Gets the rules which override the locations that custom bushes can be planted in.</summary>
   public List<PlantableRule> PlantableLocationRules { get; }
+
+  /// <summary>Gets the season in which this bush will produce its drops.</summary>
+  public List<Season> Seasons { get; }
 
   /// <summary>Gets the texture of the tea bush.</summary>
   public string Texture { get; }
