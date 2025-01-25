@@ -1,21 +1,25 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using StardewValley;
 using StardewValley.TerrainFeatures;
 
 namespace UIInfoSuite2.Compatibility.CustomBush;
 
-/// <summary>Mod API for custom bushes.</summary>
+/// <summary>Mod API for Custom Bush.</summary>
 public interface ICustomBushApi
 {
-  /// <summary>Try to get the custom bush model associated with the given bush.</summary>
+  /// <summary>Determine if the bush is a custom bush.</summary>
+  /// <param name="bush">The bush to check.</param>
+  /// <returns>True if the bush is a custom bush.</returns>
+  public bool IsCustomBush(Bush bush);
+
+  /// <summary>Try to get the custom bush instance associated with the given bush.</summary>
   /// <param name="bush">The bush to check.</param>
   /// <param name="customBush">The resulting custom bush, if applicable.</param>
-  /// <returns>Returns whether a custom bush was found.</returns>
+  /// <returns>True if a custom bush was found.</returns>
   public bool TryGetBush(Bush bush, [NotNullWhen(true)] out ICustomBush? customBush);
 
-  /// <summary>Try to get the shake off item.</summary>
-  /// <param name="bush">The bush.</param>
-  /// <param name="item">The shake off item.</param>
-  /// <returns>Returns True if the custom bush currently has an item to collect.</returns>
-  public bool TryGetShakeOffItem(Bush bush, [NotNullWhen(true)] out Item? item);
+  /// <summary>Try to get the custom bush model associated with the given bush.</summary>
+  /// <param name="bush">The bush to check.</param>
+  /// <param name="customBushData">The resulting custom bush, if applicable.</param>
+  /// <returns>True if a custom bush was found.</returns>
+  public bool TryGetData(Bush bush, [NotNullWhen(true)] out ICustomBushData? customBushData);
 }
