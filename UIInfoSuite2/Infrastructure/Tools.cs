@@ -114,23 +114,21 @@ public static class Tools
   public static Item? GetHoveredItem()
   {
     Item? hoverItem = null;
+    var page = GetCurrentMenuPage();
 
     if (Game1.activeClickableMenu == null && Game1.onScreenMenus != null)
     {
       hoverItem = Game1.onScreenMenus.OfType<Toolbar>().Select(tb => tb.hoverItem).FirstOrDefault(hi => hi is not null);
     }
-
-    if (GetCurrentMenuPage() is InventoryPage inventory)
+    else if (page is InventoryPage inventory)
     {
       hoverItem = inventory.hoveredItem;
     }
-
-    if (GetCurrentMenuPage() is CraftingPage crafting)
+    else if (page is CraftingPage crafting)
     {
       hoverItem = crafting.hoverItem;
     }
-
-    if (Game1.activeClickableMenu is ItemGrabMenu itemMenu)
+    else if (Game1.activeClickableMenu is ItemGrabMenu itemMenu)
     {
       hoverItem = itemMenu.hoveredItem;
     }

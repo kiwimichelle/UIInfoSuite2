@@ -157,7 +157,7 @@ internal class LocationOfTownsfolk : IDisposable
 
     if (ApiManager.GetApi<IBetterGameMenuApi>(ModCompat.BetterGameMenu, out var bgm) &&
         bgm.ActiveMenu != null &&
-        bgm.ActiveMenu.TryGetPage(nameof(VanillaTabOrders.Social), out var sp)
+        bgm.ActiveMenu.TryGetPage(nameof(BetterGameMenuTabs.Social), out var sp)
     )
       return sp as SocialPage;
 

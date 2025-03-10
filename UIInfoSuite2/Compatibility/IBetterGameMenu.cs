@@ -16,33 +16,6 @@ namespace Leclair.Stardew.BetterGameMenu;
 
 
 /// <summary>
-/// A tab changed event is emitted whenever the currently
-/// active tab of a Better Game Menu changes.
-/// </summary>
-public interface ITabChangedEvent
-{
-
-  /// <summary>
-  /// The Better Game Menu instance involved in the event. You
-  /// can use <see cref="IBetterGameMenuApi.AsMenu(IClickableMenu)"/>
-  /// to get a more useful interface for this menu.
-  /// </summary>
-  IClickableMenu Menu { get; }
-
-  /// <summary>
-  /// The id of the tab the Game Menu was changed to.
-  /// </summary>
-  string Tab { get; }
-
-  /// <summary>
-  /// The id of the previous tab the Game Menu displayed.
-  /// </summary>
-  string OldTab { get; }
-
-}
-
-
-/// <summary>
 /// A page created event is emitted whenever a new page
 /// is created for a tab by Better Game Menu.
 /// </summary>
@@ -169,7 +142,7 @@ public interface IBetterGameMenu
 /// all the default tabs from the base game. These values are intentionally
 /// spaced out to allow for modded tabs to be inserted at specific points.
 /// </summary>
-public enum VanillaTabOrders
+public enum BetterGameMenuTabs
 {
   Inventory = 0,
   Skills = 20,
@@ -202,9 +175,7 @@ public interface IBetterGameMenuApi
   /// </summary>
   /// <param name="texture">The texture to draw from.</param>
   /// <param name="source">The source rectangle to draw.</param>
-  /// <param name="scale">The scale to draw the source at. The scale
-  /// may be reduced if necessary to contain the drawn rectangle
-  /// within the provided bounds.</param>
+  /// <param name="scale">The scale to draw the source at.</param>
   /// <param name="frames">The number of frames to draw.</param>
   /// <param name="frameTime">The amount of time each frame should be displayed.</param>
   DrawDelegate CreateDraw(Texture2D texture, Rectangle source, float scale = 1f, int frames = 1, int frameTime = 16);
@@ -218,7 +189,7 @@ public interface IBetterGameMenuApi
   /// </summary>
   /// <param name="id">The id of the tab to add.</param>
   /// <param name="order">The order of this tab relative to other tabs.
-  /// See <see cref="VanillaTabOrders"/> for an example of existing values.</param>
+  /// See <see cref="BetterGameMenuTabs"/> for an example of existing values.</param>
   /// <param name="getDisplayName">A method that returns the display name of
   /// this tab, to be displayed in a tool-tip to the user.</param>
   /// <param name="getIcon">A method that returns an icon to be displayed
@@ -278,74 +249,9 @@ public interface IBetterGameMenuApi
     Action<IClickableMenu>? onClose = null
   );
 
-  /// <summary>
-  /// Register a tab implementation for an existing tab. This can be used
-  /// to override an existing vanilla game tab.
-  /// </summary>
-  /// <param name="id">The id of the tab to register an implementation for.
-  /// The keys for the vanilla game tabs are the same as those in the
-  /// <see cref="VanillaTabOrders"/> enum.</param>
-  /// <param name="priority">The priority of this page instance provider
-  /// for this tab. When multiple page instance providers are
-  /// registered, and the user hasn't explicitly chosen one, then the
-  /// one with the highest priority is used. Please note that a given
-  /// mod can only register one provider for any given tab.</param>
-  /// <param name="getPageInstance">A method that returns a page instance
-  /// for the tab. This should never return a <c>null</c> value.</param>
-  /// <param name="getDecoration">A method that returns a decoration for
-  /// the tab UI for this tab. This can be used to, for example, add a
-  /// sparkle to a tab to indicate that new content is available. The
-  /// expected output is either <c>null</c> if no decoration should be
-  /// displayed, or a texture, rectangle, number of animation frames
-  /// to display, and delay between frame advancements. Please note that
-  /// the decoration will be automatically cleared when the user navigates
-  /// to the tab.</param>
-  /// <param name="getTabVisible">A method that returns whether or not the
-  /// tab should be visible in the menu. This is called whenever a menu is
-  /// opened, as well as when <see cref="IBetterGameMenu.UpdateTabs(string?)"/>
-  /// is called.</param>
-  /// <param name="getMenuInvisible">A method that returns the value that the
-  /// game menu should set its <see cref="IBetterGameMenu.Invisible"/> flag
-  /// to when this is the active tab.</param>
-  /// <param name="getWidth">A method that returns a specific width to use when
-  /// rendering this tab, in case the page instance requires a different width
-  /// than the standard value.</param>
-  /// <param name="getHeight">A method that returns a specific height to use
-  /// when rendering this tab, in case the page instance requires a different
-  /// height than the standard value.</param>
-  /// <param name="onResize">A method that is called when the game window is
-  /// resized, in addition to the standard <see cref="IClickableMenu.gameWindowSizeChanged(Rectangle, Rectangle)"/>.
-  /// This can be used to recreate a menu page if necessary by returning a
-  /// new <see cref="IClickableMenu"/> instance. Several menus in the vanilla
-  /// game use this logic.</param>
-  /// <param name="onClose">A method that is called whenever a page instance
-  /// is cleaned up. The standard Game Menu doesn't call <see cref="IClickableMenu.cleanupBeforeExit"/>
-  /// of its pages, and only calls <see cref="IClickableMenu.emergencyShutDown"/>
-  /// of the currently active tab, and we're keeping that behavior for
-  /// compatibility. This method will always be called. This includes calling
-  /// it for menus that were replaced by the <c>onResize</c> method.</param>
-  void RegisterImplementation(
-    string id,
-    int priority,
-    Func<IClickableMenu, IClickableMenu> getPageInstance,
-    Func<DrawDelegate?>? getDecoration = null,
-    Func<bool>? getTabVisible = null,
-    Func<bool>? getMenuInvisible = null,
-    Func<int, int>? getWidth = null,
-    Func<int, int>? getHeight = null,
-    Func<(IClickableMenu Menu, IClickableMenu OldPage), IClickableMenu?>? onResize = null,
-    Action<IClickableMenu>? onClose = null
-  );
-
   #endregion
 
   #region Menu Class Access
-
-  /// <summary>
-  /// Return the Better Game Menu menu implementation's type, in case
-  /// you want to do spooky stuff to it, I guess.
-  /// </summary>
-  Type GetMenuType();
 
   /// <summary>
   /// The active screen's current Better Game Menu, if one is open,
@@ -361,51 +267,11 @@ public interface IBetterGameMenuApi
   /// <param name="menu">The menu to attempt to cast</param>
   IBetterGameMenu? AsMenu(IClickableMenu menu);
 
-  /// <summary>
-  /// Attempt to open a Better Game Menu. This will only work if a game menu can
-  /// be opened for the active screen.
-  /// </summary>
-  /// <param name="defaultTab">The tab that the menu should be opened to.</param>
-  /// <param name="playSound">Whether or not a sound should play when the menu is opened.</param>
-  /// <param name="closeExistingMenu">If true, attempt to close the <see cref="Game1.activeClickableMenu"/>
-  /// if one is set to make room for the game menu.</param>
-  /// <returns>The menu that was opened, if one was.</returns>
-  IBetterGameMenu? TryOpenMenu(
-    string? defaultTab = null,
-    bool playSound = false,
-    bool closeExistingMenu = false
-  );
-
   #endregion
 
   #region Menu Events
 
-  public delegate void MenuCreatedDelegate(IClickableMenu menu);
-  public delegate void TabChangedDelegate(ITabChangedEvent evt);
   public delegate void PageCreatedDelegate(IPageCreatedEvent evt);
-
-  /// <summary>
-  /// This event fires whenever the game menu is created, at the end of
-  /// the menu's constructor. As such, this is called before the new <see cref="IBetterGameMenu"/>
-  /// instance is assigned to <see cref="Game1.activeClickableMenu"/>.
-  /// </summary>
-  void OnMenuCreated(MenuCreatedDelegate handler, EventPriority priority = EventPriority.Normal);
-
-  /// <summary>
-  /// Unregister a handler for the MenuCreated event.
-  /// </summary>
-  void OffMenuCreated(MenuCreatedDelegate handler);
-
-  /// <summary>
-  /// This event fires whenever the current tab changes, except when a
-  /// game menu is first created.
-  /// </summary>
-  void OnTabChanged(TabChangedDelegate handler, EventPriority priority = EventPriority.Normal);
-
-  /// <summary>
-  /// Unregister a handler for the TabChanged event.
-  /// </summary>
-  void OffTabChanged(TabChangedDelegate handler);
 
   /// <summary>
   /// This event fires whenever a new page instance is created. This can happen
